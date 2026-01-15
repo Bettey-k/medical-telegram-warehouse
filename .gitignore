@@ -2,20 +2,19 @@
 __pycache__/
 *.pyc
 .venv/
-venv/
 
-# Environment variables
+# Environment & secrets
 .env
 *.session
 
-# Data
-data/raw/
+# Data & logs
+data/
 logs/
-
-# OS
-.DS_Store
-Thumbs.db
 
 # dbt
 target/
 dbt_packages/
+
+# OS
+.DS_Store
+Thumbs.db
