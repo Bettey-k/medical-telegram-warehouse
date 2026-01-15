@@ -1,0 +1,5 @@
+-- This test fails if any message has negative views
+
+SELECT *
+FROM {{ ref('fct_messages') }}
+WHERE view_count < 0

@@ -1,0 +1,82 @@
+version: 2
+
+models:
+  - name: dim_channels
+    description: "Dimension table containing Telegram channel metadata"
+    columns:
+      - name: channel_key
+        description: "Surrogate key for channel"
+        tests:
+          - unique
+          - not_null
+
+      - name: channel_name
+        description: "Telegram channel name"
+
+      - name: channel_type
+        description: "Category of channel (Pharmaceutical, Cosmetics, Medical)"
+
+      - name: first_post_date
+        description: "Date of first message in the channel"
+
+      - name: last_post_date
+        description: "Date of most recent message"
+
+      - name: total_posts
+        description: "Total number of messages posted"
+
+      - name: avg_views
+        description: "Average number of views per message"
+
+  - name: dim_dates
+    description: "Date dimension table for time-based analysis"
+    columns:
+      - name: date_key
+        description: "Surrogate key for date"
+        tests:
+          - unique
+          - not_null
+
+      - name: full_date
+        description: "Full calendar date"
+
+      - name: day_name
+        description: "Name of the day"
+
+      - name: month_name
+        description: "Name of the month"
+
+      - name: year
+        description: "Calendar year"
+
+  - name: fct_messages
+    description: "Fact table containing Telegram message-level metrics"
+    columns:
+      - name: message_id
+        description: "Unique Telegram message ID"
+        tests:
+          - unique
+          - not_null
+
+      - name: channel_key
+        description: "Foreign key referencing dim_channels"
+        tests:
+          - relationships:
+              to: ref('dim_channels')
+              field: channel_key
+
+      - name: date_key
+        description: "Foreign key referencing dim_dates"
+        tests:
+          - relationships:
+              to: ref('dim_dates')
+              field: date_key
+
+      - name: view_count
+        description: "Number of views for the message"
+
+      - name: message_length
+        description: "Length of the message text"
+
+      - name: has_image
+        description: "Boolean flag indicating presence of image"
