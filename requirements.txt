@@ -4,3 +4,5 @@ tqdm
 psycopg2-binary
 pandas
 sqlalchemy
+ultralytics
+opencv-python

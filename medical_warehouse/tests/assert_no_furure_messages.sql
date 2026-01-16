@@ -1,5 +1,9 @@
--- This test fails if any message has a future date
+-- This test should return 0 rows to pass
 
-SELECT *
-FROM {{ ref('fct_messages') }}
-WHERE message_date > CURRENT_DATE
+SELECT
+    f.message_id,
+    d.full_date
+FROM analytics.fct_messages f
+JOIN analytics.dim_dates d
+    ON f.date_key = d.date_key
+WHERE d.full_date > CURRENT_DATE
