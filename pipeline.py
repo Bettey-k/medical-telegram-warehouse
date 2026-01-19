@@ -1,40 +1,43 @@
 from dagster import op, job, ScheduleDefinition
 import subprocess
 import sys
-import os
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PYTHON = sys.executable
+
+
+@op
+def scrape_telegram_data():
+    try:
+        subprocess.run([PYTHON, "src/scrape_telegram.py"], check=True)
+    except Exception as e:
+        print("⚠️ scrape_telegram_data skipped:", e)
 
 
 @op
 def load_raw_to_postgres():
-    subprocess.run(
-        [sys.executable, "src/load_raw_to_postgres.py"],
-        cwd=PROJECT_ROOT,
-        check=True
-    )
+    subprocess.run([PYTHON, "src/load_raw_to_postgres.py"], check=True)
 
 
 @op
 def run_dbt_transformations():
     subprocess.run(
         ["dbt", "run"],
-        cwd=os.path.join(PROJECT_ROOT, "medical_warehouse"),
+        cwd="medical_warehouse",
         check=True
     )
 
 
 @op
 def run_yolo_enrichment():
-    subprocess.run(
-        [sys.executable, "src/yolo_detect.py"],
-        cwd=PROJECT_ROOT,
-        check=True
-    )
+    try:
+        subprocess.run([PYTHON, "src/yolo_detect.py"], check=True)
+    except Exception as e:
+        print("⚠️ run_yolo_enrichment skipped:", e)
 
 
 @job
 def medical_telegram_pipeline():
+    scrape_telegram_data()
     load_raw_to_postgres()
     run_dbt_transformations()
     run_yolo_enrichment()
