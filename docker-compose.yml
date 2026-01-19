@@ -1,0 +1,26 @@
+services:
+  medical_postgres:
+    image: postgres:15
+    container_name: medical_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: medical_dw
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  medical_pipeline:
+    build: .
+    container_name: medical_pipeline
+    depends_on:
+      - medical_postgres
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    command: dagster dev -f pipeline.py --host 0.0.0.0
+
+volumes:
+  pg_data:
