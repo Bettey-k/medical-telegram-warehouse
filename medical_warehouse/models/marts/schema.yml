@@ -80,3 +80,34 @@ models:
 
       - name: has_image
         description: "Boolean flag indicating presence of image"
+
+models:
+  - name: fct_image_detections
+    description: "Fact table containing YOLO-based image detection results linked to Telegram messages"
+
+    columns:
+      - name: message_id
+        description: "Telegram message ID associated with the image"
+        tests:
+          - not_null
+
+      - name: channel_key
+        description: "Foreign key to dim_channels"
+        tests:
+          - relationships:
+              to: ref('dim_channels')
+              field: channel_key
+
+      - name: date_key
+        description: "Foreign key to dim_dates"
+        tests:
+          - relationships:
+              to: ref('dim_dates')
+              field: date_key
+
+      - name: image_category
+        description: "Derived category from YOLO detections (promotional, product_display, lifestyle, other)"
+
+      - name: confidence_score
+        description: "Average YOLO confidence score for detected objects"
+

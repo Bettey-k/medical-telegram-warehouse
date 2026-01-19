@@ -4,3 +4,11 @@ tqdm
 psycopg2-binary
 pandas
 sqlalchemy
+ultralytics
+opencv-python
+fastapi 
+uvicorn 
+sqlalchemy 
+psycopg2-binary
+dagster 
+dagster-webserver
