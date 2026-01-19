@@ -14,6 +14,7 @@ DATABASE_URL = os.getenv(
 
 RAW_BASE_PATH = "data/raw/telegram_messages"
 
+
 def load_json_files():
     records = []
 
@@ -42,12 +43,12 @@ def load_json_files():
 
     return pd.DataFrame(records)
 
+
 def main():
     print(f"Using DATABASE_URL: {DATABASE_URL}")
     print("Loading raw Telegram JSON files...")
 
     df = load_json_files()
-
     print(f"Loaded {len(df)} records")
 
     if df.empty:
@@ -57,7 +58,18 @@ def main():
     engine = create_engine(DATABASE_URL)
 
     with engine.begin() as conn:
+        # Ensure schema exists
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS raw"))
+
+        # Ensure table exists (first run only)
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS raw.telegram_messages (
+                LIKE raw.telegram_messages INCLUDING ALL
+            )
+        """))
+
+        # Truncate instead of DROP (safe for dbt views)
+        conn.execute(text("TRUNCATE TABLE raw.telegram_messages"))
 
     print("Writing to raw.telegram_messages...")
 
@@ -65,12 +77,13 @@ def main():
         "telegram_messages",
         engine,
         schema="raw",
-        if_exists="replace",
+        if_exists="append",   # ✅ CRITICAL FIX
         index=False,
         method="multi"
     )
 
     print("✅ Data loaded successfully into raw.telegram_messages")
+
 
 if __name__ == "__main__":
     main()
